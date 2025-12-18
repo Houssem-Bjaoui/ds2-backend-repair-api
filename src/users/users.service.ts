@@ -22,4 +22,6 @@ export class UsersService {
   async findByEmail(email: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { email } });
   }
+
+ 
 }

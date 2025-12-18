@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
 
@@ -13,10 +14,10 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
       // configuration mta3 JWT
       JwtModule.register({
       secret: 'SECRET_KEY',
-      signOptions: { expiresIn: '1w' },
+      signOptions: { expiresIn: '1h' },
     }),
     ],
-  providers: [AuthService, JwtService],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 
 })
