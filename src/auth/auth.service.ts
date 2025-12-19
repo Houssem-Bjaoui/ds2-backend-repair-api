@@ -4,37 +4,51 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
-import { UserRole } from '../users/user.entity';
+import { UserRole } from 'src/users/user.entity';
+
 
 @Injectable()
 export class AuthService {
+  userRepo: any;
   constructor(
-    private usersService: UsersService,
-    private jwtService:JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
 
+// register method
 
-  async register(registerDto: RegisterDto) {
-    const { email, password, username } = registerDto;
 
-    // nchoufou email mawjoud wale 
-    const existingUser = await this.usersService.findByEmail(email);
-    if (existingUser) {
-      throw new BadRequestException('Email déjà utilisé');
-    }
+ async register(dto: RegisterDto, authHeader?: string) {
+  let creatorRole = 'TECH';
 
-    // ncryptiw mote de passe
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    //  na3mlou create lel user jdid (role par défaut TECH)
-    return this.usersService.create({
-      email,
-      username,
-      password: hashedPassword,
-      role: UserRole.TECH,
-    });
+  // Lire le token si présent
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      const token = authHeader.split(' ')[1];
+      const payload = this.jwtService.verify(token);
+      creatorRole = payload.role;
+    } catch {}
   }
+
+  // Définir le rôle
+  let role: UserRole = 'TECH' as UserRole;
+  if (dto.role === 'ADMIN' && creatorRole === 'ADMIN') {
+    role = 'ADMIN' as UserRole;
+  }
+
+  const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+  //  PASSE PAR UsersService
+  return this.usersService.create({
+    email: dto.email,
+    username: dto.username,
+    password: hashedPassword,
+    role,
+  });
+}
+
+
 
 
   // login method

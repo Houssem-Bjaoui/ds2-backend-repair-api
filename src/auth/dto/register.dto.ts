@@ -9,4 +9,6 @@ export class RegisterDto {
 
   @MinLength(6)
   password: string; // minimum 6 caractères
+
+  role?: 'ADMIN' | 'TECH'; // role optionnel
 }
