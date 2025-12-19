@@ -1,5 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Intervention } from 'src/interventions/entities/intervention.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+
+//enumeration : user ynajem ykoun ADMIN wela TECHnicien
 export enum UserRole {
   ADMIN = 'ADMIN',
   TECH = 'TECH',
@@ -27,4 +30,10 @@ export class UserEntity {
     default: UserRole.TECH,
   })
   role: UserRole;
+
+//user 3ndou des interventions
+ @OneToMany(() => Intervention, (intervention) => intervention.technician)
+interventions: Intervention[];
+
+
 }
